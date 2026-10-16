@@ -1,0 +1,76 @@
+# Coolify creates HTTPS proxy routes; only RustDesk transport ports bind the host.
+services:
+  nexus:
+    build:
+      context: https://github.com/jspearso/nox-nexus.git#nox-nexus
+      dockerfile: Dockerfile
+      args:
+        BETTERDESK_PRODUCT_VERSION: 3.5.4-nox.1
+        BETTERDESK_IMAGE_VERSION: 3.5.4-nox.1
+    expose:
+      - "5000"
+      - "21121"
+    ports:
+      - "21115:21115/tcp"
+      - "21116:21116/tcp"
+      - "21116:21116/udp"
+      - "21117:21117/tcp"
+    environment:
+      NODE_ENV: production
+      TRUST_PROXY: "1"
+      SECURE_COOKIES: "true"
+      HTTPS_ENABLED: "false"
+      PORT: "5000"
+      HOST: 0.0.0.0
+      API_HOST: 0.0.0.0
+      API_ENABLED: "false"
+      ENCRYPTED_ONLY: "1"
+      ENROLLMENT_MODE: managed
+      SERVER_BACKEND: betterdesk
+      HBBS_API_URL: http://127.0.0.1:21121/api
+      BETTERDESK_API_URL: http://127.0.0.1:21121/api
+      RUSTDESK_PATH: /opt/rustdesk
+      DATA_DIR: /app/data
+      DB_PATH: /opt/rustdesk/db_v2.sqlite3
+      PUB_KEY_PATH: /opt/rustdesk/id_ed25519.pub
+      API_KEY_PATH: /opt/rustdesk/.api_key
+      AUTH_DB_PATH: /app/data/auth.db
+      DB_TYPE: sqlite
+      DOCKER: "true"
+      RELAY_SERVERS: ${NEXUS_SERVER_HOST}:21117
+      PUBLIC_SERVER_ID: ${NEXUS_SERVER_HOST}
+      PUBLIC_RELAY_SERVER: ${NEXUS_SERVER_HOST}:21117
+      PUBLIC_API_URL: ${NEXUS_API_URL}
+      SESSION_SECRET: ${NEXUS_SESSION_SECRET}
+      ADMIN_PASSWORD: ${NEXUS_ADMIN_PASSWORD}
+      INIT_ADMIN_USER: admin
+      INIT_ADMIN_PASS: ${NEXUS_ADMIN_PASSWORD}
+      DEFAULT_ADMIN_USERNAME: admin
+      DEFAULT_ADMIN_PASSWORD: ${NEXUS_ADMIN_PASSWORD}
+      BETTERDESK_UPDATE_MODE: image
+      BETTERDESK_DOCKER_LAYOUT: single
+      BETTERDESK_IMAGE_TAG: 3.5.4-nox.1
+      AGENT_BUILD_WORKER: "off"
+      TZ: Australia/Melbourne
+    volumes:
+      - nexus-server-data:/opt/rustdesk
+      - nexus-console-data:/app/data
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - FOWNER
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:21121/api/health && curl -sf http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+volumes:
+  nexus-server-data:
+  nexus-console-data:

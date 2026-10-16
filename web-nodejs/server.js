@@ -122,7 +122,7 @@ app.use(cookieParser());
 // Store sessions in the selected BetterDesk database. This makes logout,
 // password/role changes and process restarts enforceable without another
 // hidden auth database.
-const SESSION_COOKIE = config.httpsEnabled ? 'betterdesk.sid' : 'bd.sid';
+const SESSION_COOKIE = config.secureCookies ? 'betterdesk.sid' : 'bd.sid';
 const persistentSessionStore = new DatabaseSessionStore({
     config,
     ttlMs: config.sessionMaxAge
@@ -142,7 +142,7 @@ const sessionMiddleware = session({
     saveUninitialized: false,
     store: persistentSessionStore,
     cookie: {
-        secure: config.httpsEnabled,
+        secure: config.secureCookies,
         httpOnly: true,
         sameSite: 'lax',
         maxAge: config.sessionMaxAge
