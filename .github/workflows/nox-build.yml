@@ -1,0 +1,39 @@
+name: NOX Nexus build and smoke test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production container
+        run: |
+          docker build --build-arg BETTERDESK_PRODUCT_VERSION=3.5.4-nox.1 --build-arg BETTERDESK_IMAGE_VERSION=3.5.4-nox.1 --build-arg BETTERDESK_COMMIT_SHA="$GITHUB_SHA" -t nox-nexus:test .
+      - name: Start production container
+        run: |
+          ADMIN_PASSWORD="$(openssl rand -hex 24)"
+          SESSION_SECRET="$(openssl rand -hex 48)"
+          echo "::add-mask::$ADMIN_PASSWORD"
+          echo "::add-mask::$SESSION_SECRET"
+          export ADMIN_PASSWORD SESSION_SECRET
+          docker run -d --name nexus -e ADMIN_PASSWORD -e SESSION_SECRET -e TRUST_PROXY=1 -e SECURE_COOKIES=true -e ENROLLMENT_MODE=managed nox-nexus:test
+      - name: Verify health, brand, TLS cookies and client API
+        run: |
+          for attempt in $(seq 1 60); do
+            if docker exec nexus curl -fsS http://127.0.0.1:5000/health >/dev/null && docker exec nexus curl -fsS http://127.0.0.1:21121/api/health >/dev/null; then break; fi
+            sleep 2
+          done
+          docker exec nexus curl -fsS http://127.0.0.1:5000/health
+          docker exec nexus curl -fsS http://127.0.0.1:21121/api/health
+          docker exec nexus curl -fsS -D /tmp/login-headers -H 'X-Forwarded-Proto: https' http://127.0.0.1:5000/login > /tmp/nexus-login.html
+          grep -q 'NOX Nexus' /tmp/nexus-login.html
+          grep -q 'Your connections. One place.' /tmp/nexus-login.html
+          grep -q 'github.com/jspearso/nox-nexus' /tmp/nexus-login.html
+          docker exec nexus sh -c "grep -i '^set-cookie:.*Secure' /tmp/login-headers"
+          docker exec nexus curl -fsS http://127.0.0.1:5000/branding/favicon.svg | grep -q '#a78bfa'
+      - name: Container status on failure
+        if: failure()
+        run: docker inspect --format '{{json .State.Health}}' nexus || true
