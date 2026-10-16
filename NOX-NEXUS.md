@@ -18,3 +18,11 @@ Managed enrollment requires approval of new devices.
 Administrative credentials and session secrets are generated at deployment and
 stored in Coolify, never in this repository. Back up both persistent volumes;
 preserving the server key is essential when migrating to another host.
+
+## Live service
+
+Console and RustDesk client API: https://nexus.noxcloud.com.au
+
+RustDesk client ID server: `nexus.noxcloud.com.au`. Relay server:
+`nexus.noxcloud.com.au:21117`. Set the public key provided in the console.
+The existing server identity and persistent volumes are retained.
