@@ -112,7 +112,7 @@ app.use(cookieParser());
 // express-session warns in production that MemoryStore is not for multi-process
 // or HA; BetterDesk runs one Node panel per host. Shared store (PostgreSQL/Redis)
 // is planned only for multi-instance HA — see docs/enterprise/IMPLEMENTATION_PLAN.md.
-const SESSION_COOKIE = config.httpsEnabled ? 'betterdesk.sid' : 'bd.sid';
+const SESSION_COOKIE = config.secureCookies ? 'betterdesk.sid' : 'bd.sid';
 const sessionMiddleware = session({
     secret: config.sessionSecret,
     name: SESSION_COOKIE,
@@ -120,7 +120,7 @@ const sessionMiddleware = session({
     saveUninitialized: false,
     store: new session.MemoryStore(),
     cookie: {
-        secure: config.httpsEnabled,
+        secure: config.secureCookies,
         httpOnly: true,
         sameSite: 'lax',
         maxAge: config.sessionMaxAge

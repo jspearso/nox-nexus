@@ -176,6 +176,8 @@ module.exports = {
 
     // HTTPS / SSL
     httpsEnabled: (process.env.HTTPS_ENABLED || 'false').toLowerCase() === 'true',
+    // Coolify terminates TLS before forwarding HTTP to this container.
+    secureCookies: (process.env.SECURE_COOKIES || process.env.HTTPS_ENABLED || 'false').toLowerCase() === 'true',
     httpsPort: parseInt(process.env.HTTPS_PORT, 10) || 5443,
     sslCertPath: process.env.SSL_CERT_PATH || '',
     sslKeyPath: process.env.SSL_KEY_PATH || '',

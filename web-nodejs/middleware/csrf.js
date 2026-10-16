@@ -15,8 +15,8 @@ const config = require('../config/config');
 // Secure cookies left over from a previous HTTPS configuration.  Browsers
 // refuse to send Secure cookies over HTTP and also refuse to let HTTP
 // overwrite an existing Secure cookie of the same name (RFC 6265bis §5.4.6).
-let csrfCookieSecure = config.httpsEnabled;
-const CSRF_COOKIE = config.httpsEnabled ? '__csrf' : '__csrf_h';
+let csrfCookieSecure = config.secureCookies;
+const CSRF_COOKIE = config.secureCookies ? '__csrf' : '__csrf_h';
 
 const {
     generateToken,
