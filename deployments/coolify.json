@@ -1,15 +1,15 @@
 {
   "project_uuid": "8mir17pvmmtavskkk3emuw4e",
   "service_uuid": "euthi4cimqgulckvgupuxcps",
-  "console_url": "https://nexus.134.199.171.156.sslip.io",
+  "console_url": "https://nexus.noxcloud.com.au",
   "api_url": "https://nexus-api.134.199.171.156.sslip.io",
   "server_public_key": "jN1jw5VFuJTX3MzvHwDu1BzovhJ7zCH3O+qRiTLqnwM=",
   "platform": "Coolify",
   "name": "NOX Nexus",
   "upstream_version": "BetterDesk 3.5.4",
   "verified_status": "running:healthy",
-  "verified_at": "2026-10-16T23:15:33.603440+00:00",
-  "custom_domain_status": "Awaiting complete hostname and DNS",
+  "verified_at": "2026-10-16T23:46:59.224867+00:00",
+  "custom_domain_status": "Active - DNS and hostname-validated HTTPS verified",
   "checks": [
     "console and API HTTPS",
     "console branding and source access",
@@ -20,7 +20,11 @@
     "Ed25519 public key",
     "TCP 21115, 21116, 21117",
     "UDP 21116 health echo",
-    "RustDesk NAT protocol response"
+    "RustDesk NAT protocol response",
+    "custom hostname HTTPS certificate",
+    "RustDesk account login on primary domain"
   ],
-  "credential_location": "Coolify NEXUS_ADMIN_PASSWORD environment variable; private local access handoff file"
+  "credential_location": "Coolify NEXUS_ADMIN_PASSWORD environment variable; private local access handoff file",
+  "server_host": "nexus.noxcloud.com.au",
+  "client_api_url": "https://nexus.noxcloud.com.au"
 }
