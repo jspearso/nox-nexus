@@ -313,23 +313,23 @@ function sanitizeCustomCss(value) {
 // Default branding (BetterDesk original theme)
 const DEFAULT_BRANDING = {
     // Brand identity
-    appName: 'BetterDesk',
-    appDescription: 'BetterDesk Server Management',
+    appName: 'NOX Nexus',
+    appDescription: 'NOX Cloud — connecting people and devices',
     
     // Logo configuration
-    logoType: 'image', // 'icon' | 'svg' | 'image' | 'text'
+    logoType: 'text', // 'icon' | 'svg' | 'image' | 'text'
     logoIcon: 'dns',   // Material Icons name (when logoType === 'icon')
     logoSvg: '',       // Raw SVG markup or SVG path data (when logoType === 'svg')
-    logoUrl: '/img/betterdesk_icon.png', // URL to image file (when logoType === 'image')
-    logoText: '',      // Text to display as logo (when logoType === 'text')
-    logoTextAccent: '', // Accent text (different color, e.g. product name after brand)
+    logoUrl: '/img/nox-nexus.svg', // URL to image file (when logoType === 'image')
+    logoText: 'NOX ',
+    logoTextAccent: 'Nexus',
     
     // Typography (Google Fonts)
     fontHeading: '',   // Font family for headings / logo text (empty = system default)
     fontBody: '',      // Font family for body text (empty = system default)
     
     // Favicon (SVG)
-    faviconSvg: '',   // Custom favicon SVG (empty = default)
+    faviconSvg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#0d1018"/><path d="M17 45V19l30 26V19" fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="19" r="5" fill="#6ee7d9"/><circle cx="47" cy="45" r="5" fill="#6ee7d9"/></svg>',
 
     // Console background & appearance
     bgType: 'none',     // 'none' | 'color' | 'gradient' | 'image'
@@ -347,16 +347,16 @@ const DEFAULT_BRANDING = {
     glassOpacity: '55',     // tint opacity 0-100 (%)
 
     // Login page branding
-    loginBgType: 'inherit', // 'inherit' | 'none' | 'color' | 'gradient' | 'image'
+    loginBgType: 'gradient', // 'inherit' | 'none' | 'color' | 'gradient' | 'image'
     loginBgColor: '',
-    loginBgGradient: '',
+    loginBgGradient: 'radial-gradient(ellipse at top left, #24203d, #0d1018 65%)',
     loginBgImageUrl: '',
     loginBgOverlay: '',     // dark overlay opacity 0-100 (%)
-    loginTitle: '',         // overrides the login heading
-    loginSubtitle: '',      // overrides the login subtitle
+    loginTitle: 'Your connections. One place.',
+    loginSubtitle: 'Sign in to NOX Nexus to connect people and devices.',
 
     // Footer / attribution
-    footerText: '',         // custom footer / copyright text
+    footerText: 'NOX Cloud · Nexus — connection, by design.',
     showPoweredBy: 'true',  // 'true' | 'false' — show "Powered by BetterDesk"
 
     // Agent download portal (global defaults shared by all bundles)
@@ -371,19 +371,19 @@ const DEFAULT_BRANDING = {
 
     // Appearance model metadata (v2 keeps flat keys for backward compatibility)
     appearanceSchemaVersion: '2',
-    themeMode: 'dark',       // 'dark' | 'light' | 'custom' (auto kept for backward compat → dark)
+    themeMode: 'custom',       // 'dark' | 'light' | 'custom' (auto kept for backward compat → dark)
 
     // Color scheme overrides (empty = use defaults from variables.css)
     colors: {
-        bgPrimary: '',
-        bgSecondary: '',
-        bgTertiary: '',
-        bgElevated: '',
-        textPrimary: '',
-        textSecondary: '',
-        accentBlue: '',
-        accentBlueHover: '',
-        accentBlueMuted: '',
+        bgPrimary: '#0d1018',
+        bgSecondary: '#151924',
+        bgTertiary: '#1e2332',
+        bgElevated: '#202637',
+        textPrimary: '#f0f1f6',
+        textSecondary: '#a1a8bd',
+        accentBlue: '#a78bfa',
+        accentBlueHover: '#c4b5fd',
+        accentBlueMuted: '#a78bfa',
         accentGreen: '',
         accentGreenHover: '',
         accentGreenMuted: '',
