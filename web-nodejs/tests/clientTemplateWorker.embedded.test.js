@@ -79,6 +79,15 @@ describe('clientTemplateWorker embedded artifacts', () => {
             .toBe(path.join(app, 'Contents', 'Resources'));
     });
 
+    test('keeps the crashing Windows printer adapter as an inactive reversible backup', async () => {
+        const adapter = path.join(root, 'printer_driver_adapter.dll');
+        fs.writeFileSync(adapter, 'original-adapter');
+        await worker._internals.disableRemotePrinterAdapter(root);
+        expect(fs.existsSync(adapter)).toBe(false);
+        expect(fs.readFileSync(`${adapter}.nox-disabled`, 'utf8')).toBe('original-adapter');
+        await expect(worker._internals.disableRemotePrinterAdapter(root)).resolves.toBeUndefined();
+    });
+
     test('selects the manifest asset when unrelated archives are also present', () => {
         const selected = path.join(root, 'betterdesk-support-linux-x86_64.tar.gz');
         fs.writeFileSync(selected, 'selected');

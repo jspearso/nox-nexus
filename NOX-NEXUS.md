@@ -118,3 +118,23 @@ container headers; the embedded Ed25519 profile signature and unattended policy
 were verified; PowerShell parsing and native argument quoting passed. Windows
 installation, reboot persistence and a real unattended session still require the
 pilot PC test; they cannot be verified in the Linux build workspace.
+
+### Windows printer-adapter restart workaround
+
+On the pinned 1.5.0 native Windows MSI, the remote printer adapter can terminate
+the entire desktop server with exit code 3 after printer initialization fails.
+A Windows CDB trace located the terminating thread inside
+`printer_driver_adapter.dll`. This leaves the outer Windows service running but
+restarts its `--server` child repeatedly, preventing stable signal registration.
+
+Windows packaging and the MSI deployment script now rename that optional DLL to
+`printer_driver_adapter.dll.nox-disabled`. Remote printing is temporarily
+disabled; remote desktop settings, the permanent password and device identity
+are preserved. MSI repair or upgrade can restore the original DLL, so rerun the
+workaround after changing the MSI until the native adapter is fixed.
+
+Existing installations can run `Repair-NoxNexusPrinterCrash.ps1` from the private
+`jspearso/nox-nexus-rmm` repository as SYSTEM or administrator. It preserves the
+DLL as a reversible backup and verifies a single persistent desktop-server PID
+for 30 seconds. The identical workaround passed the isolated Windows MSI test:
+https://github.com/jspearso/nox-nexus-rmm/actions/runs/39011063610.

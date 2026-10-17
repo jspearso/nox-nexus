@@ -97,6 +97,15 @@ function Stop-Client {
         Where-Object { $_.ExecutablePath -and $_.ExecutablePath.Equals($ClientExe, [StringComparison]::OrdinalIgnoreCase) } |
         ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 }
+function Disable-RemotePrinterAdapter {
+    $adapter = Join-Path $InstallDirectory 'printer_driver_adapter.dll'
+    if (Test-Path -LiteralPath $adapter) {
+        $backup = $adapter + '.nox-disabled'
+        if (Test-Path -LiteralPath $backup) { $backup += '-' + [guid]::NewGuid().ToString('N') }
+        Move-Item -LiteralPath $adapter -Destination $backup
+        Write-Output 'Remote printing disabled to avoid the native printer-adapter startup crash.'
+    }
+}
 function Start-ClientService {
     Set-Service -Name $ServiceName -StartupType Automatic
     Start-Service -Name $ServiceName
@@ -141,6 +150,7 @@ try {
     if (-not (Test-Path -LiteralPath $ClientExe)) { throw 'MSI did not install the expected client executable.' }
     $MustRestoreProfile = $true
     Stop-Client
+    Disable-RemotePrinterAdapter
     Start-ClientService
     $serviceInfo = Get-CimInstance Win32_Service -Filter "Name='BetterDesk Client'"
     if ($serviceInfo.StartName -ne 'LocalSystem') { throw 'Expected a LocalSystem service for access at the Windows sign-in screen.' }

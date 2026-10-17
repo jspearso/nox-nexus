@@ -528,6 +528,15 @@ async function _copyDir(src, dest) {
     await fsp.cp(src, dest, { recursive: true });
 }
 
+async function _disableRemotePrinterAdapter(stageDir) {
+    const adapter = path.join(stageDir, 'printer_driver_adapter.dll');
+    try {
+        await fsp.rename(adapter, `${adapter}.nox-disabled`);
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+}
+
 function _findCustomTxtTarget(stageDir, platform) {
     if (String(platform).toLowerCase() === 'macos') {
         const app = _findDirEnding(stageDir, '.app');
@@ -688,6 +697,7 @@ async function _runOne(buildRow) {
 
         const stageDir = path.join(workDir, `betterdesk-support-${buildRow.platform}-${buildRow.arch}`);
         await _copyDir(_templateSourceDir(templateDir, buildRow.platform), stageDir);
+        if (buildRow.platform === 'windows') await _disableRemotePrinterAdapter(stageDir);
 
         if (!_templateHasBinary(stageDir, buildRow.platform)) {
             throw new Error(
@@ -1095,6 +1105,7 @@ module.exports = {
         findCustomTxtTarget: _findCustomTxtTarget,
         templateSourceDir: _templateSourceDir,
         templateHasBinary: _templateHasBinary,
+        disableRemotePrinterAdapter: _disableRemotePrinterAdapter,
         filterPlatforms: _filterPlatforms,
         platformStatus: getPlatformStatus,
         findManifestArtifact: _findManifestArtifact,
