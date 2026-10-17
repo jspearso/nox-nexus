@@ -530,15 +530,12 @@ async function _copyDir(src, dest) {
 
 function _findCustomTxtTarget(stageDir, platform) {
     if (String(platform).toLowerCase() === 'macos') {
-        const marker = _findFile(stageDir, '.custom-txt-here');
-        if (marker) return path.dirname(marker);
         const app = _findDirEnding(stageDir, '.app');
         if (app) {
-            const macos = path.join(app, 'Contents', 'MacOS');
-            if (fs.existsSync(macos)) return macos;
+            return path.join(app, 'Contents', 'Resources');
         }
         const contentsMac = _findDirNamed(stageDir, 'MacOS');
-        if (contentsMac) return contentsMac;
+        if (contentsMac) return path.join(path.dirname(contentsMac), 'Resources');
     }
     const marker = path.join(stageDir, '.custom-txt-here');
     if (fs.existsSync(marker)) return stageDir;
@@ -632,6 +629,11 @@ function _sha256OfFile(filePath) {
     });
 }
 
+function _templateSourceDir(templateDir, platform) {
+    const portable = path.join(templateDir, 'portable');
+    return platform === 'linux' && fs.existsSync(portable) ? portable : templateDir;
+}
+
 function _templateHasBinary(stageDir, platform) {
     const p = String(platform || '').toLowerCase();
     if (p === 'macos') {
@@ -650,7 +652,15 @@ function _templateHasBinary(stageDir, platform) {
                 stack.push(full);
             } else if (names.has(e.name) || names.has(e.name.toLowerCase())) {
                 try {
-                    if (fs.statSync(full).size > 100 * 1024) return true;
+                    if (fs.statSync(full).size >= 32 * 1024) {
+                        const fd = fs.openSync(full, 'r');
+                        try {
+                            const header = Buffer.alloc(4);
+                            fs.readSync(fd, header, 0, 4, 0);
+                            if (header.equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))
+                                || header.subarray(0, 2).toString() === 'MZ') return true;
+                        } finally { fs.closeSync(fd); }
+                    }
                 } catch (_) { /* ignore */ }
             }
         }
@@ -677,7 +687,7 @@ async function _runOne(buildRow) {
         if (!templateDir) throw new Error(`template_missing:${key}`);
 
         const stageDir = path.join(workDir, `betterdesk-support-${buildRow.platform}-${buildRow.arch}`);
-        await _copyDir(templateDir, stageDir);
+        await _copyDir(_templateSourceDir(templateDir, buildRow.platform), stageDir);
 
         if (!_templateHasBinary(stageDir, buildRow.platform)) {
             throw new Error(
@@ -1083,6 +1093,8 @@ module.exports = {
         isSupportProduct: _isSupportProduct,
         buildCustomTxtContent: _buildCustomTxtContent,
         findCustomTxtTarget: _findCustomTxtTarget,
+        templateSourceDir: _templateSourceDir,
+        templateHasBinary: _templateHasBinary,
         filterPlatforms: _filterPlatforms,
         platformStatus: getPlatformStatus,
         findManifestArtifact: _findManifestArtifact,

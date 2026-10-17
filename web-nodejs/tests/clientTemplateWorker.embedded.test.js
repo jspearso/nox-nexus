@@ -56,6 +56,29 @@ describe('clientTemplateWorker embedded artifacts', () => {
         fs.rmSync(root, { recursive: true, force: true });
     });
 
+    test('packages the Linux portable launcher with its adjacent signed configuration', () => {
+        const portable = path.join(root, 'portable');
+        fs.mkdirSync(portable);
+        const binary = Buffer.alloc(44 * 1024);
+        binary.set([0x7f, 0x45, 0x4c, 0x46]);
+        fs.writeFileSync(path.join(portable, 'betterdesk'), binary);
+        const source = worker._internals.templateSourceDir(root, 'linux');
+        expect(source).toBe(portable);
+        expect(worker._internals.templateHasBinary(source, 'linux')).toBe(true);
+        expect(worker._internals.findCustomTxtTarget(source, 'linux')).toBe(portable);
+        fs.writeFileSync(path.join(portable, 'betterdesk'), Buffer.alloc(44 * 1024));
+        expect(worker._internals.templateHasBinary(source, 'linux')).toBe(false);
+    });
+
+    test('injects macOS configuration in Resources as required by the desktop client', () => {
+        const app = path.join(root, 'BetterDesk Client.app');
+        const macos = path.join(app, 'Contents', 'MacOS');
+        fs.mkdirSync(macos, { recursive: true });
+        fs.writeFileSync(path.join(macos, '.custom-txt-here'), 'legacy marker');
+        expect(worker._internals.findCustomTxtTarget(root, 'macos'))
+            .toBe(path.join(app, 'Contents', 'Resources'));
+    });
+
     test('selects the manifest asset when unrelated archives are also present', () => {
         const selected = path.join(root, 'betterdesk-support-linux-x86_64.tar.gz');
         fs.writeFileSync(selected, 'selected');

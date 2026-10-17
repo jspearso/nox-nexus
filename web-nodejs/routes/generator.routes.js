@@ -26,6 +26,7 @@ const config = require('../config/config');
 const brandingService = require('../services/brandingService');
 const conn = require('../services/agentBundleConnection');
 const clientConfigHost = require('../services/clientConfigHost');
+const publicEndpoints = require('../services/rustDeskPublicEndpointsService');
 const { PRODUCT_TYPES, normalizeProductType, isBetterDeskSupportBundle } = require('../lib/generatorBuildTypes');
 const EMBEDDED_MODE = String(
     process.env.BETTERDESK_CLIENT_GENERATOR_MODE || 'embedded'
@@ -196,6 +197,7 @@ async function finalizeSupportBranding(input) {
     const scheme = useHttps ? 'https' : 'http';
     const omitPort = (scheme === 'https' && apiPort === '443') || (scheme === 'http' && apiPort === '80');
     const apiServer = branding.api_server
+        || publicEndpoints.readPublicEndpointEnv().public_api_url
         || (omitPort ? `${scheme}://${host}` : `${scheme}://${host}:${apiPort}`);
     const pubKey = (await keyService.resolvePublicKey()) || branding.public_key || '';
 
@@ -404,15 +406,17 @@ router.get('/api/generator/bundles/:bundleId', requireAuth, requireAdmin, async 
 
 router.get('/api/generator/defaults', requireAuth, requireAdmin, async (req, res) => {
     const host = clientConfigHost.resolveClientFacingHost(req) || conn.defaultServerHost();
+    const endpoints = publicEndpoints.readPublicEndpointEnv();
+    const apiUrl = endpoints.public_api_url ? new URL(endpoints.public_api_url) : null;
     res.json({
         success: true,
         data: {
             server_host: host,
-            relay_host: host,
-            use_https: conn.defaultUseHttps(),
-            api_port: conn.defaultApiPort(),
+            relay_host: endpoints.public_relay_server || host,
+            use_https: apiUrl ? apiUrl.protocol === 'https:' : conn.defaultUseHttps(),
+            api_port: apiUrl ? (apiUrl.port || (apiUrl.protocol === 'https:' ? '443' : '80')) : conn.defaultApiPort(),
             public_key: (await keyService.resolvePublicKey()) || '',
-            app_name: 'BetterDesk Support Agent',
+            app_name: 'NOX Nexus Support',
         },
     });
 });
