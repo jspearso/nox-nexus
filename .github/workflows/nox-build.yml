@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build production container
         run: |
-          docker build --build-arg BETTERDESK_PRODUCT_VERSION=3.5.4-nox.1 --build-arg BETTERDESK_IMAGE_VERSION=3.5.4-nox.1 --build-arg BETTERDESK_COMMIT_SHA="$GITHUB_SHA" -t nox-nexus:test .
+          docker build --build-arg BETTERDESK_PRODUCT_VERSION=3.5.160-nox.1 --build-arg BETTERDESK_IMAGE_VERSION=3.5.160-nox.1 --build-arg BETTERDESK_COMMIT_SHA="$GITHUB_SHA" -t nox-nexus:test .
       - name: Start production container
         run: |
           ADMIN_PASSWORD="$(openssl rand -hex 24)"

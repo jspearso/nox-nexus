@@ -2,11 +2,11 @@
 services:
   nexus:
     build:
-      context: https://github.com/jspearso/nox-nexus.git#nox-nexus
+      context: https://github.com/jspearso/nox-nexus.git#nox-generator-fix
       dockerfile: Dockerfile
       args:
-        BETTERDESK_PRODUCT_VERSION: 3.5.4-nox.1
-        BETTERDESK_IMAGE_VERSION: 3.5.4-nox.1
+        BETTERDESK_PRODUCT_VERSION: 3.5.160-nox.1
+        BETTERDESK_IMAGE_VERSION: 3.5.160-nox.1
     expose:
       - "5000"
       - "21121"
@@ -49,8 +49,11 @@ services:
       DEFAULT_ADMIN_PASSWORD: ${NEXUS_ADMIN_PASSWORD}
       BETTERDESK_UPDATE_MODE: image
       BETTERDESK_DOCKER_LAYOUT: single
-      BETTERDESK_IMAGE_TAG: 3.5.4-nox.1
-      AGENT_BUILD_WORKER: "off"
+      BETTERDESK_IMAGE_TAG: 3.5.160-nox.1
+      AGENT_BUILD_WORKER: "on"
+      BETTERDESK_CLIENT_GENERATOR_MODE: legacy-custom-txt
+      BETTERDESK_CLIENT_REPO: jspearso/nox-nexus-client
+      BETTERDESK_CLIENT_RELEASE_TAG: desktop/nox-nexus-1.5.0-1
       TZ: Australia/Melbourne
     volumes:
       - nexus-server-data:/opt/rustdesk
