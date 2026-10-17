@@ -318,11 +318,11 @@ describe('brandingService.generateThemeCss', () => {
         expect(readability.issues.some(issue => issue.id === 'page-text')).toBe(true);
     });
 
-    it('default favicon uses a large letter B mark on a dark tile', () => {
+    it('default favicon uses the NOX connection mark on a dark tile', () => {
         const svg = brandingService.generateFavicon();
-        expect(svg).toMatch(/font-size="23"/);
-        expect(svg).toMatch(/>B<\/text>/);
-        expect(svg).toMatch(/fill="#0d1117"/);
-        expect(svg).not.toMatch(/M8 10h16/);
+        expect(svg).toMatch(/viewBox="0 0 64 64"/);
+        expect(svg).toMatch(/stroke="#a78bfa"/);
+        expect(svg).toMatch(/fill="#0d1018"/);
+        expect(svg).not.toMatch(/>B<\/text>/);
     });
 });
