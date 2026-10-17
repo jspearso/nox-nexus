@@ -6,9 +6,9 @@
   "server_public_key": "jN1jw5VFuJTX3MzvHwDu1BzovhJ7zCH3O+qRiTLqnwM=",
   "platform": "Coolify",
   "name": "NOX Nexus",
-  "upstream_version": "BetterDesk 3.5.4",
+  "upstream_version": "BetterDesk development 3.5.160",
   "verified_status": "running:healthy",
-  "verified_at": "2026-10-16T23:46:59.224867+00:00",
+  "verified_at": "2026-10-17T05:30:38+00:00",
   "custom_domain_status": "Active - DNS and hostname-validated HTTPS verified",
   "checks": [
     "console and API HTTPS",
@@ -22,9 +22,37 @@
     "UDP 21116 health echo",
     "RustDesk NAT protocol response",
     "custom hostname HTTPS certificate",
-    "RustDesk account login on primary domain"
+    "RustDesk account login on primary domain",
+    "generator and branding regression suites: 61 tests passed",
+    "production Docker build and branded login smoke checks",
+    "client enrollment and branding API routed under /client-api",
+    "all six portable downloads: SHA-256, Ed25519 signed profile, incoming-only settings, server identity and compiled signing trust key",
+    "macOS signed profile in Contents/Resources; Linux profile beside portable launcher",
+    "active generator queue: six ready artifacts, no queued or failed active targets"
   ],
   "credential_location": "Coolify NEXUS_ADMIN_PASSWORD environment variable; private local access handoff file",
   "server_host": "nexus.noxcloud.com.au",
-  "client_api_url": "https://nexus.noxcloud.com.au"
+  "client_api_url": "https://nexus.noxcloud.com.au/client-api",
+  "upstream_commit": "8b79e6a3489c009086f5811887e780aedff72a0b",
+  "source_branch": "nox-generator-fix",
+  "generator": {
+    "mode": "legacy-custom-txt",
+    "worker_enabled": true,
+    "client_repository": "https://github.com/jspearso/nox-nexus-client",
+    "release_tag": "desktop/nox-nexus-1.5.0-1",
+    "signing_public_key": "Gsnnioq2V89Bbd9IpR+tbA1mcwTUSjTyT4PiY75QVTM=",
+    "template_status": "ready",
+    "client_build_run": "https://github.com/jspearso/nox-nexus-client/actions/runs/39001847262",
+    "portable_template_count": 6,
+    "ready_builds": 6,
+    "download_url": "https://nexus.noxcloud.com.au/d/nox-nexus-support",
+    "bundle_id": "fd4fc91bf197",
+    "client_source_commit": "0820ef3",
+    "release_workflow_fix_commit": "3610fd8",
+    "archive_sha256": "b9b8c92ad821886866aca4be762dc110a32b3e27e81561a417348dd71afe1079",
+    "code_signing": "unsigned native portable builds",
+    "release_publication": "All native build and template validation jobs passed. Duplicate upload paths caused publication job failure; archive independently verified and missing checksum restored. Workflow corrected in 3610fd8.",
+    "baseline_server_build_run": "https://github.com/jspearso/nox-nexus/actions/runs/39001830443"
+  },
+  "deployed_source_commit": "809a8f9"
 }

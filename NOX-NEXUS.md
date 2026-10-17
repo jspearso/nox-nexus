@@ -5,8 +5,9 @@ NOX Cloud remote access: connecting people and devices.
 Based on BetterDesk development 3.5.160 (upstream commit 8b79e6a3489c009086f5811887e780aedff72a0b), retaining its AGPL-3.0 license,
 copyright notices, and access to corresponding source. The console uses NOX Nexus
 identity, a violet and charcoal palette, an N connection mark, and NOX Cloud copy.
-Standard RustDesk desktop clients remain compatible. BetterDesk's Tauri clients
-are upstream alpha software and are not represented as production-ready clients.
+Standard RustDesk desktop clients remain compatible. The Support Generator uses
+the current native Flutter desktop client templates. These are unsigned portable
+builds, without Windows code-signing or macOS notarization.
 
 Coolify runs the combined Go server and Node.js console with isolated persistent
 volumes for server keys/device data and console accounts/configuration. HTTPS is
@@ -48,3 +49,11 @@ retired package formats must not remain in the active queue.
 Both SQLite databases and the server identity were backed up in the private
 `/app/data/pre-generator-upgrade` directory before upgrading. Enrollment remains
 managed; approving a connecting device is separate from generating an installer.
+
+The live Support download is https://nexus.noxcloud.com.au/d/nox-nexus-support.
+Windows, Linux and macOS each have x64 and ARM64 portable downloads. All six
+archives were downloaded and verified against their published SHA-256 hashes;
+their configuration signatures, server identity, incoming-only settings and
+compiled signing trust keys were checked. Linux configuration sits beside its
+portable launcher, and macOS configuration is in the app's `Contents/Resources`
+directory, matching the client loader.
