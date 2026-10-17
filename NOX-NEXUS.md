@@ -21,7 +21,13 @@ preserving the server key is essential when migrating to another host.
 
 ## Live service
 
-Console and RustDesk client API: https://nexus.noxcloud.com.au
+Console: https://nexus.noxcloud.com.au
+
+Client API: https://nexus.noxcloud.com.au/client-api
+
+The client API path routes directly to the Go service, including BetterDesk
+branding, telemetry and enrollment endpoints. It remains separate from the web
+console API on the same hostname.
 
 RustDesk client ID server: `nexus.noxcloud.com.au`. Relay server:
 `nexus.noxcloud.com.au:21117`. Set the public key provided in the console.

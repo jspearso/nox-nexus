@@ -15,6 +15,16 @@ services:
       - "21116:21116/tcp"
       - "21116:21116/udp"
       - "21117:21117/tcp"
+    labels:
+      - "traefik.http.routers.nox-nexus-client-api.entrypoints=https"
+      - "traefik.http.routers.nox-nexus-client-api.rule=Host(`nexus.noxcloud.com.au`) && PathPrefix(`/client-api/`)"
+      - "traefik.http.routers.nox-nexus-client-api.priority=200"
+      - "traefik.http.routers.nox-nexus-client-api.tls=true"
+      - "traefik.http.routers.nox-nexus-client-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.nox-nexus-client-api.service=nox-nexus-client-api"
+      - "traefik.http.routers.nox-nexus-client-api.middlewares=nox-nexus-client-api-strip"
+      - "traefik.http.middlewares.nox-nexus-client-api-strip.stripprefix.prefixes=/client-api"
+      - "traefik.http.services.nox-nexus-client-api.loadbalancer.server.port=21121"
     environment:
       NODE_ENV: production
       TRUST_PROXY: "1"
