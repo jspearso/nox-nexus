@@ -2,7 +2,7 @@
 
 NOX Cloud remote access: connecting people and devices.
 
-Based on BetterDesk stable 3.5.4 (upstream main), retaining its AGPL-3.0 license,
+Based on BetterDesk development 3.5.160 (upstream commit 8b79e6a3489c009086f5811887e780aedff72a0b), retaining its AGPL-3.0 license,
 copyright notices, and access to corresponding source. The console uses NOX Nexus
 identity, a violet and charcoal palette, an N connection mark, and NOX Cloud copy.
 Standard RustDesk desktop clients remain compatible. BetterDesk's Tauri clients
@@ -26,3 +26,19 @@ Console and RustDesk client API: https://nexus.noxcloud.com.au
 RustDesk client ID server: `nexus.noxcloud.com.au`. Relay server:
 `nexus.noxcloud.com.au:21117`. Set the public key provided in the console.
 The existing server identity and persistent volumes are retained.
+
+## Generator deployment
+
+The retired 3.5.4 Go/Tauri generator is replaced by the current Support Generator.
+`AGENT_BUILD_WORKER=on` and `BETTERDESK_CLIENT_GENERATOR_MODE=legacy-custom-txt`
+enable the upstream template packaging worker in the all-in-one container.
+The desktop templates are built from `jspearso/nox-nexus-client` with this
+instance's public signing key and pinned to `desktop/nox-nexus-1.5.0-1`.
+The private signing seed stays in the persistent console volume. Generated
+archives contain a signed incoming-only configuration and platform installation
+helpers. This mode offers portable archives for Windows, Linux, and macOS;
+retired package formats must not remain in the active queue.
+
+Both SQLite databases and the server identity were backed up in the private
+`/app/data/pre-generator-upgrade` directory before upgrading. Enrollment remains
+managed; approving a connecting device is separate from generating an installer.
