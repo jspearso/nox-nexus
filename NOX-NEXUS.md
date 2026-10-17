@@ -57,3 +57,64 @@ their configuration signatures, server identity, incoming-only settings and
 compiled signing trust keys were checked. Linux configuration sits beside its
 portable launcher, and macOS configuration is in the app's `Contents/Resources`
 directory, matching the client loader.
+
+## Windows MSI deployment for 897FM
+
+Use `scripts/deploy/Install-NoxNexus897FM.ps1` in an elevated Windows PowerShell
+session on one pilot workstation first:
+
+```powershell
+$password = Read-Host 'This PC unattended password' -AsSecureString
+.\Install-NoxNexus897FM.ps1 -UnattendedPassword $password
+```
+
+The script selects the pinned x64 or ARM64 native MSI and verifies its SHA-256
+before running `msiexec /qn /norestart`. It enables the automatic LocalSystem
+service, configures the NOX ID/relay/API endpoints, sets the supplied permanent
+password, verifies the settings through the native CLI, then installs the signed
+incoming-only profile and restarts the service. MSI exit code 3010 is propagated
+when Windows requests a reboot. Other installer failures stop provisioning.
+
+The Windows MSI retains the internal product, directory and service name
+`BetterDesk Client`. Its signed profile uses that same app name so its registry,
+service and password configuration paths remain consistent. NOX appearance is
+provided at runtime by the Client Branding API. Both MSI packages are unsigned.
+An existing custom.txt from a different deployment causes the script to stop for
+an explicit migration; a rerun of this deployment temporarily removes its own
+profile to allow the administrator to update its password and restores it in a
+finally block. The permanent password is never written into the script, MSI log,
+signed profile or deployment receipt. The native password-setting CLI briefly
+receives it as a process argument; run provisioning only in a trusted admin/SYSTEM
+context. Supply a unique per-device secret through your password manager or
+Intune/RMM secret provider. Do not embed a shared password or admin API token in a
+GPO startup script.
+
+After installation:
+
+1. Record the reported device ID (also saved in the admin/SYSTEM-only
+   `%ProgramData%\NOX Nexus Deployment\deployment.json`).
+2. Approve the device in the NOX Nexus enrollment queue, matching its ID and PC.
+3. Add it to **device group 897FM** under Devices. Do this centrally; the endpoint
+   installer deliberately has no administrator token for group assignment.
+4. Under Users, assign each authorized operator to **user group 897FM**, with the
+   required connection permission. The existing user-group membership is kept.
+5. Store that workstation's peer password in an access-controlled operator vault.
+   Operators log into their own BetterDesk account and use the peer password for
+   unattended connections. Confirm access after a PC reboot and at the Windows
+   sign-in screen before expanding deployment.
+
+The live 897FM device group is linked to user group 897FM for device visibility;
+administrative roles retain their normal access. This server version does not
+enforce a group-specific allowlist on each native punch/relay connection. Someone
+outside the group who knows the device ID and peer password may still connect.
+`LOGGED_IN_ONLY_INITIATOR=Y` can require account login globally, but does not add
+per-device group enforcement. This script does not change that global setting.
+See upstream `docs/setup/RUSTDESK_CLIENT_DEPLOYMENT.md` and
+`docs/wiki/Fleet-and-Policies.md` for these limits. Strict group-only remote
+authorization needs an additional enforced access-control mechanism.
+
+Validation: both published MSI downloads matched their pinned hashes and MSI
+container headers; the embedded Ed25519 profile signature and unattended policy
+were verified; PowerShell parsing and native argument quoting passed. Windows
+installation, reboot persistence and a real unattended session still require the
+pilot PC test; they cannot be verified in the Linux build workspace.
