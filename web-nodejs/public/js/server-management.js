@@ -248,12 +248,12 @@
     // ── Files tab ────────────────────────────────────────────────────────
 
     const filesView = (() => {
-        let cwd = '/';
+        let cwd = '';
         let editing = null; // { path, size, mtime, etag }
         let loaded = false;
 
         async function refresh(path) {
-            const target = path || document.getElementById('sm-files-path').value || cwd;
+            const target = path || (loaded ? document.getElementById('sm-files-path').value : '') || cwd;
             try {
                 const data = await api(`/api/server-management/files?path=${encodeURIComponent(target)}`);
                 cwd = data.cwd || target;
@@ -438,7 +438,7 @@
             const rows = filtered.map((s) => {
                 const stateClass = s.state === 'active' || s.state === 'running' ? 'active'
                     : (s.state === 'failed' ? 'failed' : '');
-                const actions = (isWin
+                const actions = s.readOnly ? '' : (isWin
                     ? ['start', 'stop', 'restart']
                     : ['start', 'stop', 'restart', 'reload', 'enable', 'disable']
                 ).map((act) => `<button class="btn btn-tertiary" data-svc="${escapeHtml(s.name)}" data-act="${act}">

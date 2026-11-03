@@ -696,7 +696,9 @@ function isRecentLastOnline(lastOnline) {
 function normalisePeer(peer) {
     if (!peer) return peer;
 
-    const liveOnline = !!(peer.live_online);
+    // Recent HTTP contact alone does not make a native desktop connectable.
+    const liveOnline = !!peer.live_online && (peer.signal_ready !== false
+        || !!peer.cdap_connected || !!peer.mesh_connected);
     const banned = !!(peer.banned);
     const lastOnline = peer.last_online || '';
     const rawDeviceType = String(peer.device_type || '').trim().toLowerCase();

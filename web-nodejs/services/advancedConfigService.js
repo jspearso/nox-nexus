@@ -110,7 +110,9 @@ const FILE_CATALOG = [
     },
     {
         id: 'docker-supervisord',
-        path: () => path.join(REPO_ROOT, 'docker', 'supervisord.conf'),
+        path: () => process.env.DOCKER === 'true'
+            ? '/etc/supervisor/conf.d/betterdesk.conf'
+            : path.join(REPO_ROOT, 'docker', 'supervisord.conf'),
         category: 'console',
         requiresRestart: 'console'
     },
@@ -128,6 +130,7 @@ function getDefinition(id) {
 }
 
 function isPlatformAllowed(def) {
+    if (process.env.DOCKER === 'true' && SYSTEMD_FILE_IDS.has(def.id)) return false;
     if (!def.platform) return true;
     return process.platform === def.platform;
 }

@@ -967,10 +967,9 @@ func (s *Server) handleClientHeartbeat(w http.ResponseWriter, r *http.Request) {
 	}
 	// Update peer status to ONLINE
 	_ = s.db.UpdatePeerStatus(deviceID, "ONLINE", clientIP)
-	// HTTP heartbeats are also a liveness signal for BetterDesk clients that
-	// do not maintain a UDP/WebSocket signal connection. Refresh the in-memory
-	// peer map so the signal heartbeat cleaner does not mark them offline again.
-	s.peers.TouchHeartbeat(deviceID)
+	// HTTP contact is inventory liveness, not proof that the signal transport
+	// still exists. Only signal heartbeats may extend a signal registration.
+	// The peer API reports recent HTTP contact separately from signal_ready.
 
 	// If the user logged in before the peer row existed, bind owner now.
 	db.ApplyActiveSessionOwner(s.db, deviceID, body.UUID)

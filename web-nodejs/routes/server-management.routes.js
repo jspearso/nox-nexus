@@ -94,7 +94,7 @@ router.get('/api/server-management/resources', auth, (req, res) => {
 // ─── Files ────────────────────────────────────────────────────────────────────
 
 router.get('/api/server-management/files', auth, async (req, res) => {
-    const p = String(req.query.path || '/');
+    const p = String(req.query.path || process.env.BETTERDESK_PATH || '/opt/rustdesk');
     try {
         const data = await sm.listDirectory(p);
         res.json({ success: true, ...data, cwd: data.path, entries: data.items || [] });

@@ -757,7 +757,6 @@ func (s *Server) processRegisterPk(msg *pb.RegisterPk, addrStr string) *pb.Rende
 			ID:      id,
 			LastReg: time.Now(),
 		}
-		s.peers.Put(entry)
 	}
 
 	// Bind the persisted device identity before processing RegisterPk. After a
@@ -803,6 +802,9 @@ func (s *Server) processRegisterPk(msg *pb.RegisterPk, addrStr string) *pb.Rende
 			entry.ConnType = peer.ConnTCP
 		}
 	}
+	// Rejected keys must never create a live entry or refresh its lifetime.
+	// Publish only after the persisted UUID and PK have both been verified.
+	s.peers.Put(entry)
 	s.bindTCPSessionPeer(addrStr, id)
 
 	// Persist to database

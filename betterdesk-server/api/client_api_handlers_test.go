@@ -550,3 +550,28 @@ func TestDecodeClientAbPostBodyInvalidJSON(t *testing.T) {
 		t.Fatal("expected syntax error, not EOF")
 	}
 }
+
+func TestHTTPHeartbeatDoesNotReviveSignalTransport(t *testing.T) {
+	database := testSetupDB(t)
+	defer database.Close()
+	if err := database.UpsertPeer(&db.Peer{ID: "HTTPBEAT", Status: "OFFLINE"}); err != nil {
+		t.Fatal(err)
+	}
+	peers := peer.NewMap()
+	lastSignal := time.Now().Add(-2 * config.RegTimeout)
+	peers.Put(&peer.Entry{ID: "HTTPBEAT", LastReg: lastSignal})
+	srv := New(config.DefaultConfig(), database, peers, nil, "test")
+	req := httptest.NewRequest(http.MethodPost, "/api/heartbeat", strings.NewReader(`{"id":"HTTPBEAT"}`))
+	response := httptest.NewRecorder()
+	srv.handleClientHeartbeat(response, req)
+	if response.Code != http.StatusOK {
+		t.Fatalf("heartbeat status = %d", response.Code)
+	}
+	if peers.IsOnline("HTTPBEAT", config.RegTimeout) || !peers.Get("HTTPBEAT").LastReg.Equal(lastSignal) {
+		t.Fatal("HTTP heartbeat refreshed an expired signal transport")
+	}
+	stored, err := database.GetPeer("HTTPBEAT")
+	if err != nil || stored == nil || time.Since(stored.LastOnline) > config.RegTimeout {
+		t.Fatalf("HTTP inventory liveness was not retained: %v", err)
+	}
+}

@@ -5,8 +5,8 @@ services:
       context: https://github.com/jspearso/nox-nexus.git#nox-generator-fix
       dockerfile: Dockerfile
       args:
-        BETTERDESK_PRODUCT_VERSION: 3.5.160-nox.1
-        BETTERDESK_IMAGE_VERSION: 3.5.160-nox.1
+        BETTERDESK_PRODUCT_VERSION: 3.5.160-nox.2
+        BETTERDESK_IMAGE_VERSION: 3.5.160-nox.2
     expose:
       - "5000"
       - "21121"
@@ -59,7 +59,7 @@ services:
       DEFAULT_ADMIN_PASSWORD: ${NEXUS_ADMIN_PASSWORD}
       BETTERDESK_UPDATE_MODE: image
       BETTERDESK_DOCKER_LAYOUT: single
-      BETTERDESK_IMAGE_TAG: 3.5.160-nox.1
+      BETTERDESK_IMAGE_TAG: 3.5.160-nox.2
       AGENT_BUILD_WORKER: "on"
       BETTERDESK_CLIENT_GENERATOR_MODE: legacy-custom-txt
       BETTERDESK_CLIENT_REPO: jspearso/nox-nexus-client

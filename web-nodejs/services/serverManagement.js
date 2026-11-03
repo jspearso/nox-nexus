@@ -395,7 +395,23 @@ function listServicesWindows() {
     return services;
 }
 
+function listContainerProcesses() {
+    const commands = fs.readdirSync('/proc').filter((name) => /^\d+$/.test(name)).map((pid) => {
+        try { return fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0'); }
+        catch (_) { return []; }
+    });
+    return [
+        ['betterdesk-server', (args) => args[0] === '/usr/local/bin/betterdesk-server', 'Go signal, relay and API process'],
+        ['betterdesk-console', (args) => args[0] === 'node' && args[1] === '/app/server.js', 'Node.js console process'],
+    ].map(([name, matches, description]) => {
+        const running = commands.some(matches);
+        return { name, active: running ? 'active' : 'inactive', sub: running ? 'running' : 'stopped',
+            description: `${description} (container; managed by Supervisor)`, readOnly: true };
+    });
+}
+
 function listServices() {
+    if (isLinux && process.env.DOCKER === 'true') return listContainerProcesses();
     if (isLinux) return listServicesLinux().filter((service) => isAllowedBetterDeskService(service.name));
     if (isWindows) return listServicesWindows().filter((service) => isAllowedBetterDeskService(service.name));
     return [];

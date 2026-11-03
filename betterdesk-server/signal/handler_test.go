@@ -483,6 +483,9 @@ func TestProcessRegisterPkPreservesPersistedIdentityAfterRestart(t *testing.T) {
 	if got := registerPkResult(srv.processRegisterPk(takeover, "203.0.113.10:50123")); got != pb.RegisterPkResponse_NOT_SUPPORT {
 		t.Fatalf("mismatched persisted PK = %v, want NOT_SUPPORT", got)
 	}
+	if srv.peers.Get("RESTART1") != nil || srv.peers.IsOnline("RESTART1", config.RegTimeout) {
+		t.Fatal("rejected RegisterPk created a live signal registration")
+	}
 	persisted, err := database.GetPeer("RESTART1")
 	if err != nil {
 		t.Fatal(err)

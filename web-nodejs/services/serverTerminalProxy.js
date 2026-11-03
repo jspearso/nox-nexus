@@ -37,7 +37,8 @@ try {
 }
 
 const isWindows = process.platform === 'win32';
-const DEFAULT_SHELL = isWindows ? (process.env.COMSPEC || 'powershell.exe') : '/bin/bash';
+const DEFAULT_SHELL = isWindows ? (process.env.COMSPEC || 'powershell.exe')
+    : (fs.existsSync('/bin/bash') ? '/bin/bash' : '/bin/sh');
 const ALLOWED_LOGIN_SHELLS = new Set([
     '/bin/bash',
     '/bin/sh',
@@ -57,7 +58,7 @@ function resolveLoginShell(shell) {
         }
         return DEFAULT_SHELL;
     }
-    if (typeof shell === 'string' && ALLOWED_LOGIN_SHELLS.has(shell)) {
+    if (typeof shell === 'string' && ALLOWED_LOGIN_SHELLS.has(shell) && fs.existsSync(shell)) {
         return shell;
     }
     if (typeof shell === 'string' && shell.startsWith('/') && !shell.includes('..')) {
